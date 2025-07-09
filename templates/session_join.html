@@ -1,0 +1,1048 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Cluedo Tracker</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <style>
+        /* Stili specifici per la pagina di join */
+        .join-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .join-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .join-header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .join-header i {
+            margin-right: 1rem;
+            color: #ffd700;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .join-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .join-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .session-info {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .session-info h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .session-code {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+            letter-spacing: 3px;
+        }
+
+        .players-count {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        .players-count i {
+            color: #27ae60;
+            margin-right: 0.5rem;
+        }
+
+        .session-description {
+            color: #34495e;
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .join-form {
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            box-sizing: border-box;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+            cursor: pointer;
+        }
+
+        .form-group select option:disabled {
+            color: #999;
+            background: #f5f5f5;
+            font-style: italic;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-group small {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            margin: 0.5rem;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 1.2rem 2rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            box-shadow: 0 6px 12px rgba(240, 147, 251, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .session-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            animation: slideInDown 0.3s ease-out;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards Selection Styles */
+        .cards-info {
+            margin-bottom: 1rem;
+        }
+
+        .cards-info p {
+            color: #7f8c8d;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .card-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .card-section h4 {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-section h4 i {
+            color: #667eea;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .card-checkbox {
+            cursor: pointer;
+            display: block;
+        }
+
+        .card-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+        .card-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .card-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .card-checkbox input[type="checkbox"]:checked + .card-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-item i {
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+
+        .card-checkbox input[type="checkbox"]:checked + .card-item i {
+            color: white;
+        }
+
+        .card-item span {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0.5rem;
+            }
+
+            .card-item {
+                padding: 0.75rem;
+                min-height: 60px;
+            }
+
+            .card-item span {
+                font-size: 0.75rem;
+            }
+
+            .join-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .join-header h1 {
+                font-size: 2rem;
+            }
+
+            .session-code {
+                font-size: 1rem;
+                padding: 0.8rem 1.5rem;
+                letter-spacing: 2px;
+            }
+
+            .btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+
+            .session-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Effetti aggiuntivi */
+        .join-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group input[readonly] {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        /* Multi-step wizard styles */
+        .step-container {
+            animation: fadeInSlide 0.5s ease-out;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .step-header h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .step-header p {
+            color: #7f8c8d;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .step-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .step-buttons .btn {
+            flex: 1;
+            margin: 0;
+        }
+
+        .step-progress {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .progress-bar-container {
+            background: #e9ecef;
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicators {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .step-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .step-indicator.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step-indicator.completed {
+            background: #27ae60;
+            color: white;
+        }
+
+        .step-indicator.completed::after {
+            content: "✓";
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Mobile responsiveness for steps */
+        @media (max-width: 768px) {
+            .step-buttons {
+                flex-direction: column;
+            }
+
+            .step-buttons .btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+
+            .step-indicator {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body class="join-page">
+    <header class="join-header">
+        <h1><i class="fas fa-gamepad"></i> Unisciti alla Partita</h1>
+    </header>
+
+    <div class="join-container">
+        <div class="join-card">
+            <div id="alertContainer"></div>
+            
+            <!-- Django Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}{{ message.tags }}{% endif %}" style="display: block;">
+                        <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="session-info">
+                {% if session %}
+                <h2><i class="fas fa-users"></i> {{ session.name }}</h2>
+                <div class="session-code">
+                    <i class="fas fa-key"></i> {{ session_code }}
+                </div>
+                <p class="players-count">
+                    <i class="fas fa-user-friends"></i> {{ users_count }}/{{ max_users }} giocatori
+                </p>
+                {% if session.description %}
+                    <p class="session-description">{{ session.description }}</p>
+                {% endif %}
+                {% else %}
+                <h2><i class="fas fa-door-open"></i> Unisciti a una Sessione Cluedo</h2>
+                <p>Inserisci un codice sessione per unirti a una partita esistente.</p>
+                {% endif %}
+            </div>
+
+            <form id="joinForm" class="join-form">
+                {% csrf_token %}
+                
+                <!-- Step 1: Nome giocatore -->
+                <div class="step-container" id="step1" style="display: block;">
+                    <div class="step-header">
+                        <h3><i class="fas fa-user"></i> Passo 1 di 3</h3>
+                        <p>Inserisci il tuo nome</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i> Il tuo Nome:
+                        </label>
+                        <input type="text" id="username" name="username" required maxlength="15" 
+                               placeholder="Inserisci il tuo nome">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(1)">
+                        <i class="fas fa-arrow-right"></i> Continua
+                    </button>
+                </div>
+
+                <!-- Step 2: Selezione personaggio -->
+                <div class="step-container" id="step2" style="display: none;">
+                    <div class="step-header">
+                        <h3><i class="fas fa-mask"></i> Passo 2 di 3</h3>
+                        <p>Scegli il tuo personaggio</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="character">
+                            <i class="fas fa-mask"></i> Scegli il tuo Personaggio:
+                        </label>
+                        <select id="character" name="character" required>
+                            <option value="">-- Seleziona un personaggio --</option>
+                            {% for choice in character_choices %}
+                                <option value="{{ choice.0 }}" {% if choice.0 in taken_characters %}disabled{% endif %}>
+                                    {{ choice.1 }}{% if choice.0 in taken_characters %} (già preso){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if taken_characters %}
+                            <small>Personaggi già presi: {% for char in taken_characters %}{{ char|capfirst }}{% if not forloop.last %}, {% endif %}{% endfor %}</small>
+                        {% endif %}
+                    </div>
+                    <div class="step-buttons">
+                        <button type="button" class="btn btn-outline" onclick="prevStep(2)">
+                            <i class="fas fa-arrow-left"></i> Indietro
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)">
+                            <i class="fas fa-arrow-right"></i> Continua
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Selezione carte iniziali -->
+                <div class="step-container" id="step3" style="display: none;">
+                    <div class="step-header">
+                        <h3><i class="fas fa-cards-blank"></i> Passo 3 di 3</h3>
+                        <p>Seleziona le tue carte iniziali</p>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i class="fas fa-cards-blank"></i> Le tue Carte Iniziali:
+                        </label>
+                        <div class="cards-info">
+                            <p><small>Seleziona le carte che hai ricevuto all'inizio della partita. Queste informazioni rimarranno private.</small></p>
+                        </div>
+                        
+                        <!-- Personaggi -->
+                        <div class="card-section">
+                            <h4><i class="fas fa-user-tie"></i> Personaggi</h4>
+                            <div class="cards-grid">
+                                {% for character_code, character_name in character_choices %}
+                                <label class="card-checkbox">
+                                    <input type="checkbox" name="initial_cards" value="character_{{ character_code }}">
+                                    <div class="card-item">
+                                        <i class="fas fa-user"></i>
+                                        <span>{{ character_name }}</span>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Armi -->
+                        <div class="card-section">
+                            <h4><i class="fas fa-hammer"></i> Armi</h4>
+                            <div class="cards-grid">
+                                {% for weapon in weapons %}
+                                <label class="card-checkbox">
+                                    <input type="checkbox" name="initial_cards" value="weapon_{{ weapon.code }}">
+                                    <div class="card-item">
+                                        <i class="{{ weapon.icon }}"></i>
+                                        <span>{{ weapon.name }}</span>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Stanze -->
+                        <div class="card-section">
+                            <h4><i class="fas fa-home"></i> Stanze</h4>
+                            <div class="cards-grid">
+                                {% for room in rooms %}
+                                <label class="card-checkbox">
+                                    <input type="checkbox" name="initial_cards" value="room_{{ room.code }}">
+                                    <div class="card-item">
+                                        <i class="{{ room.icon }}"></i>
+                                        <span>{{ room.name }}</span>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-buttons">
+                        <button type="button" class="btn btn-outline" onclick="prevStep(3)">
+                            <i class="fas fa-arrow-left"></i> Indietro
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="joinButton">
+                            <div class="loading-spinner" id="loadingSpinner"></div>
+                            <i class="fas fa-sign-in-alt" id="joinIcon"></i> 
+                            <span id="joinText">Unisciti alla Partita</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Hidden field for device ID -->
+                <input type="hidden" id="deviceId" name="deviceId">
+                
+                <!-- Progress bar -->
+                <div class="step-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBarFill" style="width: 33.33%;"></div>
+                    </div>
+                    <div class="step-indicators">
+                        <div class="step-indicator active" id="indicator1">1</div>
+                        <div class="step-indicator" id="indicator2">2</div>
+                        <div class="step-indicator" id="indicator3">3</div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="session-actions">
+                {% if session_code %}
+                <a href="{% url 'session_qr' session_code %}" class="btn btn-secondary">
+                    <i class="fas fa-qrcode"></i> Codice QR
+                </a>
+                {% endif %}
+                <a href="{% url 'home' %}" class="btn btn-outline">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SESSION_CODE = '{{ session_code }}';
+        let currentStep = 1;
+        const totalSteps = 3;
+        
+        // Generate device ID if not exists
+        function generateDeviceId() {
+            let deviceId = localStorage.getItem('cluedo_device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                localStorage.setItem('cluedo_device_id', deviceId);
+            }
+            return deviceId;
+        }
+
+        // Show alert function
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
+                ${message}
+            `;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            alertDiv.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Loading state management
+        function setLoadingState(loading) {
+            const button = document.getElementById('joinButton');
+            const spinner = document.getElementById('loadingSpinner');
+            const icon = document.getElementById('joinIcon');
+            const text = document.getElementById('joinText');
+            
+            if (loading) {
+                button.disabled = true;
+                spinner.style.display = 'block';
+                icon.style.display = 'none';
+                text.textContent = 'Connessione in corso...';
+                button.style.opacity = '0.7';
+            } else {
+                button.disabled = false;
+                spinner.style.display = 'none';
+                icon.style.display = 'inline';
+                text.textContent = 'Unisciti alla Partita';
+                button.style.opacity = '1';
+            }
+        }
+
+        // Step navigation functions
+        function showStep(step) {
+            // Hide all steps
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).style.display = 'none';
+                document.getElementById(`indicator${i}`).classList.remove('active');
+                if (i < step) {
+                    document.getElementById(`indicator${i}`).classList.add('completed');
+                } else {
+                    document.getElementById(`indicator${i}`).classList.remove('completed');
+                }
+            }
+            
+            // Show current step
+            document.getElementById(`step${step}`).style.display = 'block';
+            document.getElementById(`indicator${step}`).classList.add('active');
+            
+            // Update progress bar
+            const progress = (step / totalSteps) * 100;
+            document.getElementById('progressBarFill').style.width = progress + '%';
+            
+            currentStep = step;
+        }
+
+        function nextStep(fromStep) {
+            // Validate current step
+            if (!validateStep(fromStep)) {
+                return;
+            }
+            
+            if (fromStep < totalSteps) {
+                showStep(fromStep + 1);
+                
+                // Auto-focus next input
+                setTimeout(() => {
+                    const nextStepElement = document.getElementById(`step${fromStep + 1}`);
+                    const firstInput = nextStepElement.querySelector('input:not([readonly]), select');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }, 300);
+            }
+        }
+
+        function prevStep(fromStep) {
+            if (fromStep > 1) {
+                showStep(fromStep - 1);
+                
+                // Auto-focus previous input
+                setTimeout(() => {
+                    const prevStepElement = document.getElementById(`step${fromStep - 1}`);
+                    const firstInput = prevStepElement.querySelector('input:not([readonly]), select');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }, 300);
+            }
+        }
+
+        function validateStep(step) {
+            switch (step) {
+                case 1:
+                    const username = document.getElementById('username').value.trim();
+                    if (!username) {
+                        showAlert('Per favore inserisci il tuo nome', 'error');
+                        document.getElementById('username').focus();
+                        return false;
+                    }
+                    if (username.length < 2) {
+                        showAlert('Il nome deve essere di almeno 2 caratteri', 'error');
+                        document.getElementById('username').focus();
+                        return false;
+                    }
+                    showAlert(`Benvenuto, ${username}!`, 'success');
+                    return true;
+                    
+                case 2:
+                    const character = document.getElementById('character').value;
+                    if (!character) {
+                        showAlert('Per favore seleziona un personaggio', 'error');
+                        document.getElementById('character').focus();
+                        return false;
+                    }
+                    const characterName = document.getElementById('character').selectedOptions[0].text;
+                    showAlert(`Hai scelto: ${characterName}`, 'success');
+                    return true;
+                    
+                default:
+                    return true;
+            }
+        }
+
+        // Initialize form
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('deviceId').value = generateDeviceId();
+            
+            // Focus on username input with animation
+            const usernameInput = document.getElementById('username');
+            setTimeout(() => {
+                usernameInput.focus();
+            }, 300);
+            
+            // Add input animations
+            const inputs = document.querySelectorAll('input[type="text"], select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Handle form submission
+            document.getElementById('joinForm').addEventListener('submit', handleJoinSubmit);
+            
+            // Enable Enter key navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && currentStep < totalSteps) {
+                    e.preventDefault();
+                    nextStep(currentStep);
+                }
+            });
+            
+            // Initialize first step
+            showStep(1);
+        });
+
+        async function handleJoinSubmit(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const character = document.getElementById('character').value;
+            const deviceId = document.getElementById('deviceId').value;
+            
+            // Final validation
+            if (!username || !character || !SESSION_CODE) {
+                showAlert('Dati mancanti. Ricontrolla tutti i passaggi.', 'error');
+                return;
+            }
+            
+            // Count selected cards
+            const selectedCards = [];
+            const cardCheckboxes = document.querySelectorAll('input[name="initial_cards"]:checked');
+            cardCheckboxes.forEach(checkbox => {
+                selectedCards.push(checkbox.value);
+            });
+            
+            if (selectedCards.length === 0) {
+                showAlert('Seleziona almeno una carta iniziale', 'error');
+                return;
+            }
+            
+            setLoadingState(true);
+            
+            try {
+                // Prepare form data for Django view
+                const formData = new FormData();
+                formData.append('session_code', SESSION_CODE);
+                formData.append('player_name', username);
+                formData.append('character', character);
+                formData.append('device_id', deviceId);
+                formData.append('initial_cards', JSON.stringify(selectedCards));
+                formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                
+                const response = await fetch(`/join/${SESSION_CODE}/`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const responseText = await response.text();
+                    
+                    // Check if we got redirected (success) or if there's an error message
+                    if (response.url.includes('/session/')) {
+                        // Success - we were redirected to the game session
+                        localStorage.setItem('cluedo_session_code', SESSION_CODE);
+                        localStorage.setItem('cluedo_username', username);
+                        localStorage.setItem('cluedo_device_id', deviceId);
+                        
+                        showAlert('Connessione riuscita! Reindirizzamento...', 'success');
+                        
+                        setTimeout(() => {
+                            window.location.href = `/session/${SESSION_CODE}/`;
+                        }, 1500);
+                    } else {
+                        // Check for error messages in the response
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(responseText, 'text/html');
+                        const errorMessages = doc.querySelectorAll('.alert-error, .messages .error');
+                        
+                        if (errorMessages.length > 0) {
+                            let errorText = '';
+                            errorMessages.forEach(msg => {
+                                errorText += msg.textContent.trim() + ' ';
+                            });
+                            throw new Error(errorText.trim() || 'Errore durante la connessione');
+                        } else {
+                            throw new Error('Errore durante la connessione alla sessione');
+                        }
+                    }
+                } else {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error joining session:', error);
+                showAlert(error.message || 'Errore durante la connessione. Riprova.', 'error');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add subtle animation to the card
+            const card = document.querySelector('.join-card');
+            setTimeout(() => {
+                card.style.transform = 'translateY(-5px)';
+            }, 500);
+        });
+    </script>
+</body>
+</html>

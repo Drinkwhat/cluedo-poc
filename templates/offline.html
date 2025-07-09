@@ -1,0 +1,606 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modalità Offline - Cluedo Tracker</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cluedo Tracker">
+    
+    <style>
+        .offline-page {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 2rem;
+        }
+
+        .offline-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .offline-icon {
+            font-size: 4rem;
+            color: #95a5a6;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
+        .offline-title {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+        }
+
+        .offline-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin: 0 0 2rem 0;
+            line-height: 1.6;
+        }
+
+        .connection-status {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 4px solid #95a5a6;
+        }
+
+        .connection-status h3 {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .connection-status p {
+            color: #7f8c8d;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .feature-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-section.available {
+            border-left: 4px solid #27ae60;
+        }
+
+        .feature-section.unavailable {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .feature-section h4 {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-section.available h4 i {
+            color: #27ae60;
+        }
+
+        .feature-section.unavailable h4 i {
+            color: #e74c3c;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            color: #7f8c8d;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .feature-list li i {
+            width: 16px;
+        }
+
+        .available .feature-list li i {
+            color: #27ae60;
+        }
+
+        .unavailable .feature-list li i {
+            color: #e74c3c;
+        }
+
+        .offline-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 0.5rem;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            box-shadow: 0 4px 8px rgba(149, 165, 166, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            filter: none;
+        }
+
+        .connection-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #e74c3c;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .connection-indicator.checking {
+            background: #f39c12;
+        }
+
+        .connection-indicator.connected {
+            background: #27ae60;
+        }
+
+        .connection-indicator i {
+            animation: spin 1s linear infinite;
+        }
+
+        .connection-indicator.connected i,
+        .connection-indicator:not(.checking) i {
+            animation: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: #e8f4f8;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid #b8dce8;
+        }
+
+        .tips-section h4 {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tips-section h4 i {
+            color: #3498db;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tips-list li {
+            color: #7f8c8d;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .tips-list li i {
+            color: #3498db;
+            margin-top: 0.2rem;
+            width: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .offline-page {
+                padding: 1rem;
+            }
+
+            .offline-container {
+                padding: 2rem;
+            }
+
+            .offline-title {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .offline-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="offline-page">
+    <div class="offline-container">
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+        
+        <h1 class="offline-title">Modalità Offline</h1>
+        <p class="offline-subtitle">
+            Sembra che tu abbia perso la connessione di rete. Non preoccuparti, 
+            i tuoi dati locali sono al sicuro e alcune funzionalità sono ancora disponibili!
+        </p>
+        
+        <div class="connection-indicator" id="connectionStatus">
+            <i class="fas fa-wifi-slash"></i>
+            <span>Disconnesso</span>
+        </div>
+        
+        <div class="connection-status">
+            <h3>
+                <i class="fas fa-info-circle"></i>
+                Stato Connessione
+            </h3>
+            <p>
+                L'applicazione richiede una connessione di rete per sincronizzare i dati 
+                con altri giocatori, ma molte funzionalità rimangono utilizzabili offline.
+            </p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-section available">
+                <h4>
+                    <i class="fas fa-check-circle"></i>
+                    Funzionalità Disponibili
+                </h4>
+                <ul class="feature-list">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        Visualizza le tue carte salvate
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        Leggi e modifica le note personali
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        Marca carte come possedute o escluse
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        Naviga tra le pagine dell'app
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="feature-section unavailable">
+                <h4>
+                    <i class="fas fa-times-circle"></i>
+                    Richiede Connessione
+                </h4>
+                <ul class="feature-list">
+                    <li>
+                        <i class="fas fa-times"></i>
+                        Creare o unirsi a sessioni
+                    </li>
+                    <li>
+                        <i class="fas fa-times"></i>
+                        Condividere carte con altri giocatori
+                    </li>
+                    <li>
+                        <i class="fas fa-times"></i>
+                        Aggiornamenti in tempo reale
+                    </li>
+                    <li>
+                        <i class="fas fa-times"></i>
+                        Sincronizzazione dati
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="tips-section">
+            <h4>
+                <i class="fas fa-lightbulb"></i>
+                Suggerimenti
+            </h4>
+            <ul class="tips-list">
+                <li>
+                    <i class="fas fa-wifi"></i>
+                    Verifica che il tuo dispositivo sia connesso alla stessa rete Wi-Fi dell'host
+                </li>
+                <li>
+                    <i class="fas fa-mobile-alt"></i>
+                    Controlla se i dati mobili sono attivi se non hai accesso al Wi-Fi
+                </li>
+                <li>
+                    <i class="fas fa-router"></i>
+                    Assicurati che il router di rete funzioni correttamente
+                </li>
+                <li>
+                    <i class="fas fa-sync-alt"></i>
+                    Prova a ricaricare la pagina dopo aver ripristinato la connessione
+                </li>
+            </ul>
+        </div>
+        
+        <div class="offline-actions">
+            <button onclick="checkConnection()" class="btn btn-primary" id="retryBtn">
+                <i class="fas fa-sync-alt"></i> Riprova Connessione
+            </button>
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Torna alla Home
+            </a>
+            <button onclick="reloadPage()" class="btn btn-outline">
+                <i class="fas fa-redo"></i> Ricarica Pagina
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let isChecking = false;
+        
+        function updateConnectionStatus(status, text) {
+            const indicator = document.getElementById('connectionStatus');
+            indicator.className = `connection-indicator ${status}`;
+            
+            let icon = 'fas fa-wifi-slash';
+            if (status === 'checking') icon = 'fas fa-spinner';
+            if (status === 'connected') icon = 'fas fa-wifi';
+            
+            indicator.innerHTML = `<i class="${icon}"></i><span>${text}</span>`;
+        }
+        
+        function checkConnection() {
+            if (isChecking) return;
+            
+            isChecking = true;
+            const retryBtn = document.getElementById('retryBtn');
+            retryBtn.disabled = true;
+            
+            updateConnectionStatus('checking', 'Verificando...');
+            
+            // Test connection with a simple fetch
+            fetch('/', { 
+                method: 'HEAD',
+                cache: 'no-cache',
+                timeout: 5000
+            })
+            .then(response => {
+                if (response.ok) {
+                    updateConnectionStatus('connected', 'Connesso');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    throw new Error('Connection failed');
+                }
+            })
+            .catch(() => {
+                updateConnectionStatus('', 'Ancora disconnesso');
+                setTimeout(() => {
+                    retryBtn.disabled = false;
+                    isChecking = false;
+                }, 2000);
+            });
+        }
+        
+        function reloadPage() {
+            window.location.reload();
+        }
+        
+        // Auto-check connection every 30 seconds
+        setInterval(() => {
+            if (!isChecking) {
+                checkConnection();
+            }
+        }, 30000);
+        
+        // Check connection when page becomes visible
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !isChecking) {
+                setTimeout(checkConnection, 1000);
+            }
+        });
+        
+        // Listen for online/offline events
+        window.addEventListener('online', () => {
+            updateConnectionStatus('connected', 'Connesso');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+        
+        window.addEventListener('offline', () => {
+            updateConnectionStatus('', 'Disconnesso');
+        });
+    </script>
+</body>
+</html>
+    </div>
+
+    <script>
+        function checkConnection() {
+            if (navigator.onLine) {
+                window.location.reload();
+            } else {
+                alert('Still offline. Please check your internet connection.');
+            }
+        }
+        
+        // Auto-reload when connection is restored
+        window.addEventListener('online', function() {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+    </script>
+
+    <style>
+        .offline-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+            margin: 2rem auto;
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            color: #95a5a6;
+            margin-bottom: 1rem;
+        }
+        
+        .offline-features {
+            text-align: left;
+            margin: 2rem 0;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .offline-features h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .offline-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem 0;
+        }
+        
+        .offline-features li {
+            padding: 0.3rem 0;
+        }
+        
+        .offline-features .fas {
+            width: 20px;
+            margin-right: 0.5rem;
+        }
+        
+        .fa-check {
+            color: #27ae60;
+        }
+        
+        .fa-times {
+            color: #e74c3c;
+        }
+        
+        .offline-actions {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</body>
+</html>

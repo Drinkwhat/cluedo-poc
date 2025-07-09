@@ -1,0 +1,927 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ session.name }} - Host Dashboard - Cluedo Tracker</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cluedo Tracker">
+    
+    <style>
+        .host-session-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Session Header Card */
+        .session-header-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .session-info-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .session-main-info h2 {
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .session-stats {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        .stat-item i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .session-code-display {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .session-code-display:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .session-code-display:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .session-code-display::after {
+            content: '📋 Clicca per copiare';
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: 400;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .session-code-display:hover::after {
+            opacity: 1;
+        }
+
+        /* Navigation Pills */
+        .nav-pills {
+            display: flex;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 0.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            gap: 0.5rem;
+        }
+
+        .nav-pill {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            text-decoration: none;
+        }
+
+        .nav-pill.active,
+        .nav-pill:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .content-card h3 {
+            color: #2c3e50;
+            margin: 0 0 1.5rem 0;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .content-card h3 i {
+            color: #667eea;
+        }
+
+        /* Players List */
+        .players-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .player-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .player-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .player-details h4 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        .player-details p {
+            margin: 0.2rem 0 0 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .host-badge {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Connection Info */
+        .connection-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .connection-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .connection-item label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .connection-item .value {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        /* Session Code Specific Styles */
+        .session-code-item {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-left: 4px solid #667eea;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .session-code-value {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+
+        .copy-btn-large {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .copy-btn-large:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        /* QR Code Styles */
+        .qr-code-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .qr-code-section label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .qr-container {
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid #f8f9fa;
+        }
+
+        #qrcode {
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        #qrcode canvas,
+        #qrcode img {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-instructions {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .qr-instructions i {
+            color: #667eea;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            box-shadow: 0 4px 8px rgba(240, 147, 251, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Session Actions */
+        .session-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-card i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .action-card h4 {
+            margin: 0 0 0.5rem 0;
+            color: #2c3e50;
+        }
+
+        .action-card p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .host-session-page {
+                padding: 1rem 0;
+            }
+
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .session-info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .session-code-display {
+                font-size: 2rem;
+                letter-spacing: 3px;
+                padding: 1.2rem 2rem;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-pills {
+                overflow-x: auto;
+            }
+
+            .nav-pill {
+                min-width: 120px;
+            }
+
+            .session-actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .session-code-value span {
+                font-size: 1.5rem !important;
+                letter-spacing: 2px !important;
+            }
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert-info {
+            background: #ebf8ff;
+            color: #2a69ac;
+            border: 1px solid #90cdf4;
+        }
+    </style>
+</head>
+<body class="host-session-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-crown"></i> Dashboard Host</h1>
+            <p>Gestisci la tua sessione di gioco</p>
+        </div>
+
+        <!-- Django Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}{{ message.tags }}{% endif %}">
+                    <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Session Header Card -->
+        <div class="session-header-card">
+            <div class="session-info-grid">
+                <div class="session-main-info">
+                    <h2>
+                        <i class="fas fa-gamepad"></i>
+                        {{ session.name }}
+                    </h2>
+                    <div class="session-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span>{{ session.players.count }}/{{ session.max_players }} giocatori</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-circle {% if session.is_active %}text-success{% else %}text-danger{% endif %}"></i>
+                            <span>{% if session.is_active %}Attiva{% else %}Inattiva{% endif %}</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Creata {{ session.created_at|timesince }} fa</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="session-code-display">
+                    {{ session_code }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Pills -->
+        <div class="nav-pills">
+            <a href="#players" class="nav-pill active">
+                <i class="fas fa-users"></i> Giocatori
+            </a>
+            <a href="#connection" class="nav-pill">
+                <i class="fas fa-wifi"></i> Connessione
+            </a>
+            <a href="#actions" class="nav-pill">
+                <i class="fas fa-cogs"></i> Azioni
+            </a>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+            <!-- Players Panel -->
+            <div class="content-card">
+                <h3><i class="fas fa-users"></i> Giocatori Connessi</h3>
+                <div class="players-list">
+                    {% for player in session.players.all %}
+                    <div class="player-item">
+                        <div class="player-info">
+                            <div class="player-avatar">
+                                {{ player.name|first|upper }}
+                            </div>
+                            <div class="player-details">
+                                <h4>
+                                    {{ player.name }}
+                                    {% if player.is_host %}
+                                        <span class="host-badge">
+                                            <i class="fas fa-crown"></i> Host
+                                        </span>
+                                    {% endif %}
+                                </h4>
+                                <p>{{ player.get_character_display|default:"Nessun personaggio" }}</p>
+                            </div>
+                        </div>
+                        <div class="player-actions">
+                            {% if not player.is_host %}
+                                <button class="btn btn-sm btn-outline" onclick="kickPlayer('{{ player.id }}')">
+                                    <i class="fas fa-user-times"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p style="text-align: center; color: #7f8c8d; padding: 2rem;">
+                        <i class="fas fa-users-slash" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                        Nessun giocatore connesso
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Connection Info Panel -->
+            <div class="content-card">
+                <h3><i class="fas fa-wifi"></i> Informazioni Connessione</h3>
+                <div class="connection-info">
+                    <div class="connection-item">
+                        <label>URL Mobile</label>
+                        <div class="value">
+                            <span id="mobile-url-display">{{ session.mobile_url }}</span>
+                            <button class="copy-btn" onclick="copyToClipboard(mobileUrl)">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code Section -->
+                    <div class="qr-code-section">
+                        <label>QR Code per Accesso Rapido</label>
+                        <div class="qr-container">
+                            <div id="qrcode"></div>
+                            <p class="qr-instructions">
+                                <i class="fas fa-mobile-alt"></i>
+                                Scansiona per unirti alla sessione
+                            </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- fine content-grid precedente -->
+
+        <!-- Session Actions -->
+        <div class="session-actions-card" style="margin-top: 2rem; max-width: 1168px; margin-left: auto; margin-right: auto;">
+            <div class="content-card session-header-card" style="margin-bottom: 0;">
+                <h3><i class="fas fa-cogs"></i> Azioni Sessione</h3>
+                <div class="session-actions-grid">
+                    <div class="action-card" onclick="shareSession()">
+                        <i class="fas fa-share-alt"></i>
+                        <h4>Condividi</h4>
+                        <p>Condividi il link della sessione</p>
+                    </div>
+                    <div class="action-card" onclick="refreshSession()">
+                        <i class="fas fa-sync-alt"></i>
+                        <h4>Aggiorna</h4>
+                        <p>Ricarica i dati della sessione</p>
+                    </div>
+                    <div class="action-card" onclick="endSession()" style="border: 2px solid #e74c3c;">
+                        <i class="fas fa-stop" style="color: #e74c3c;"></i>
+                        <h4 style="color: #e74c3c;">Termina</h4>
+                        <p>Chiudi la sessione di gioco</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+        <!-- Navigation Actions -->
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="{% url 'host_home' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Torna al Dashboard
+            </a>
+            <a href="{% url 'player_session' session_code %}" class="btn btn-primary">
+                <i class="fas fa-play"></i> Entra nel Gioco
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // URLs and data
+        const sessionCode = '{{ session_code }}';
+        const sessionName = '{{ session.name }}';
+        const mobileUrl = '{{ session.mobile_url }}' || `http://{{ local_ip }}:8000/join/{{ session_code }}/`;
+        
+        // Debug: Log all variables
+        console.log('Session Code:', sessionCode);
+        console.log('Session Name:', sessionName);
+        console.log('Mobile URL:', mobileUrl);
+        console.log('Local IP:', '{{ local_ip }}');
+
+        // Generate QR Code on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update URL display
+            document.getElementById('mobile-url-display').textContent = mobileUrl;
+            
+            // Generate QR Code
+            generateQRCode();
+            
+            // Add click event listener to session code display
+            const sessionCodeDisplay = document.querySelector('.session-code-display');
+            if (sessionCodeDisplay) {
+                sessionCodeDisplay.addEventListener('click', copySessionCode);
+            }
+        });
+
+        // Generate QR Code using QRServer API (reliable)
+        function generateQRCode() {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ''; // Clear existing content
+            
+            // Debug: Log the URL
+            console.log('Generating QR Code for URL:', mobileUrl);
+            
+            // Show loading message
+            qrContainer.innerHTML = '<p style="color: #667eea;"><i class="fas fa-spinner fa-spin"></i> Generazione QR Code...</p>';
+            
+            // Use QRServer API directly
+            const encodedUrl = encodeURIComponent(mobileUrl);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodedUrl}&color=2c3e50&bgcolor=ffffff&margin=10`;
+            
+            qrContainer.innerHTML = `
+                <img src="${qrUrl}" 
+                     alt="QR Code per ${sessionCode}" 
+                     style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 180px; height: auto;"
+                     onload="console.log('QR Code caricato con successo'); this.style.opacity='1';"
+                     onerror="handleQRError(this)"
+                     style="opacity: 0; transition: opacity 0.3s;"
+                />
+            `;
+        }
+        
+        // Handle QR Code loading errors
+        function handleQRError(img) {
+            console.error('Errore nel caricamento del QR Code');
+            img.parentElement.innerHTML = `
+                <div style="background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; padding: 2rem; text-align: center;">
+                    <i class="fas fa-qrcode" style="font-size: 3rem; color: #dee2e6; margin-bottom: 1rem;"></i>
+                    <p style="color: #6c757d; margin: 0 0 1rem 0;">QR Code non disponibile</p>
+                    <div style="font-family: monospace; font-size: 0.8rem; background: white; padding: 0.5rem; border-radius: 4px; word-break: break-all;">
+                        ${mobileUrl}
+                    </div>
+                    <button onclick="generateQRCode()" class="copy-btn" style="margin-top: 1rem;">
+                        <i class="fas fa-sync"></i> Riprova
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Alternative QR generation (keeping the fallback function)
+        function generateQRCodeFallback() {
+            generateQRCode(); // Since we're now using the reliable method as default
+        }
+
+        // Copy session code to clipboard
+        function copySessionCode() {
+            const codeOnly = sessionCode; // Solo il codice, non l'URL completo
+            copyToClipboard(codeOnly);
+            console.log('Session code copied:', codeOnly);
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                showAlert('Copiato negli appunti!', 'success');
+            }, function() {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showAlert('Copiato negli appunti!', 'success');
+            });
+        }
+
+        // Share session
+        function shareSession() {
+            const url = mobileUrl;
+            const text = `Unisciti alla mia partita di Cluedo!\nCodice: ${sessionCode}\nLink: ${url}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `Partita Cluedo - ${sessionName}`,
+                    text: text,
+                    url: url
+                });
+            } else {
+                copyToClipboard(text);
+            }
+        }
+
+        // Refresh session
+        function refreshSession() {
+            location.reload();
+        }
+
+        // End session
+        function endSession() {
+            if (confirm('Sei sicuro di voler terminare questa sessione? Tutti i giocatori verranno disconnessi.')) {
+                fetch(`/api/sessions/${sessionCode}/end/`, {
+                  // ...resto invariato...
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('Sessione terminata!', 'success');
+                        setTimeout(() => {
+                            window.location.href = '/host';
+                        }, 1500);
+                    } else {
+                        showAlert(data.message || 'Errore nella terminazione della sessione', 'error');
+                    }
+                })
+                .catch(() => {
+                    showAlert('Errore di rete', 'error');
+                });
+            }
+        }
+
+        // Funzione per ottenere il CSRF token
+        function getCSRFToken() {
+            const name = 'csrftoken';
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    return decodeURIComponent(cookie.substring(name.length + 1));
+                }
+            }
+            return '';
+        }
+
+        // Kick player
+        function kickPlayer(playerId) {
+            if (confirm('Sei sicuro di voler rimuovere questo giocatore dalla sessione?')) {
+                // TODO: Implement player kick
+                showAlert('Funzionalità in via di sviluppo', 'info');
+            }
+        }
+
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            document.querySelector('.container').insertBefore(alert, document.querySelector('.page-header').nextSibling);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        // Navigation pills
+        document.querySelectorAll('.nav-pill').forEach(pill => {
+            pill.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,660 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea Sessione - Cluedo Tracker</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    
+    <style>
+        /* Stili per create session */
+        .create-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .create-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .create-header h1 {
+            color: white;
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .create-header .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin: 0;
+            font-weight: 300;
+        }
+
+        .create-header i {
+            margin-right: 1rem;
+            color: #ffd700;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .create-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .create-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-section h2 i {
+            margin-right: 0.8rem;
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-group:hover {
+            border-color: rgba(102, 126, 234, 0.2);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.8rem;
+            transform: scale(1.2);
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .help-text {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: block;
+            background: #fee;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            animation: slideInDown 0.3s ease-out;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .create-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .create-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Effetti aggiuntivi */
+        .create-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="create-page">
+    <header class="create-header">
+        <h1><i class="fas fa-plus-circle"></i> Crea Sessione</h1>
+        <p class="subtitle">Configura una nuova partita di Cluedo</p>
+    </header>
+
+    <div class="create-container">
+        <div class="create-card">
+            <div id="alertContainer"></div>
+            
+            <!-- Django Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}{{ message.tags }}{% endif %}" style="display: block;">
+                        <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="create-session-form" id="createForm">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h2><i class="fas fa-cog"></i> Configurazione Sessione</h2>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">
+                            <i class="fas fa-tag"></i> Nome Sessione
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <div class="error">{{ form.name.errors.0 }}</div>
+                        {% endif %}
+                        <small class="help-text">Scegli un nome identificativo per la tua partita</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.max_players.id_for_label }}">
+                            <i class="fas fa-users"></i> Numero Massimo Giocatori
+                        </label>
+                        {{ form.max_players }}
+                        {% if form.max_players.errors %}
+                            <div class="error">{{ form.max_players.errors.0 }}</div>
+                        {% endif %}
+                        <small class="help-text">Raccomandato: 3-6 giocatori per una partita ottimale</small>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2><i class="fas fa-sliders-h"></i> Opzioni Avanzate</h2>
+                    
+                    <div class="checkbox-group">
+                        {{ form.allow_card_sharing }}
+                        <label for="{{ form.allow_card_sharing.id_for_label }}">
+                            <strong>Permetti Condivisione Carte</strong>
+                            <small class="help-text">I giocatori possono condividere informazioni sulle carte tra loro</small>
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        {{ form.auto_reveal_cards }}
+                        <label for="{{ form.auto_reveal_cards.id_for_label }}">
+                            <strong>Rivela Carte Automaticamente</strong>
+                            <small class="help-text">Le carte vengono rivelate automaticamente agli altri giocatori</small>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="createButton">
+                        <div class="loading-spinner" id="loadingSpinner"></div>
+                        <i class="fas fa-rocket" id="createIcon"></i>
+                        <span id="createText">Crea Sessione</span>
+                    </button>
+                    <a href="{% url 'host_home' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Indietro
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        window.DJANGO_CONFIG = {
+            csrfToken: '{{ csrf_token }}',
+            apiBaseUrl: '/api/',
+            staticUrl: '{% get_static_prefix %}'
+        };
+
+        // Show alert function
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
+                ${message}
+            `;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            alertDiv.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Loading state management
+        function setLoadingState(loading) {
+            const button = document.getElementById('createButton');
+            const spinner = document.getElementById('loadingSpinner');
+            const icon = document.getElementById('createIcon');
+            const text = document.getElementById('createText');
+            
+            if (loading) {
+                button.disabled = true;
+                spinner.style.display = 'block';
+                icon.style.display = 'none';
+                text.textContent = 'Creazione in corso...';
+                button.style.opacity = '0.7';
+            } else {
+                button.disabled = false;
+                spinner.style.display = 'none';
+                icon.style.display = 'inline';
+                text.textContent = 'Crea Sessione';
+                button.style.opacity = '1';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus on name input
+            const nameInput = document.querySelector('input[name="name"]');
+            if (nameInput) {
+                setTimeout(() => {
+                    nameInput.focus();
+                }, 300);
+            }
+
+            // Handle form submission
+            document.getElementById('createForm').addEventListener('submit', function(event) {
+                const nameValue = nameInput ? nameInput.value.trim() : '';
+                
+                if (!nameValue) {
+                    event.preventDefault();
+                    showAlert('Per favore inserisci un nome per la sessione', 'error');
+                    if (nameInput) nameInput.focus();
+                    return;
+                }
+
+                if (nameValue.length < 3) {
+                    event.preventDefault();
+                    showAlert('Il nome della sessione deve essere di almeno 3 caratteri', 'error');
+                    if (nameInput) nameInput.focus();
+                    return;
+                }
+                
+                setLoadingState(true);
+            });
+
+            // Add input animations
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+
+            // Add checkbox animations
+            const checkboxGroups = document.querySelectorAll('.checkbox-group');
+            checkboxGroups.forEach(group => {
+                group.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                });
+                
+                group.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+        <div class="form-actions">
+            <a href="{% url 'host_home' %}" class="btn btn-secondary">
+                ← Annulla
+            </a>
+            <button type="submit" class="btn btn-primary">
+                🎮 Crea Sessione
+            </button>
+        </div>
+    </form>
+
+    <div class="preview-section">
+        <h3>📋 Cosa Succede Dopo</h3>
+        <ol>
+            <li><strong>Sessione Creata:</strong> Riceverai un codice univoco di 6 caratteri</li>
+            <li><strong>QR Code:</strong> Verrà generato automaticamente per l'accesso rapido</li>
+            <li><strong>Condivisione:</strong> I giocatori possono unirsi tramite codice o QR</li>
+            <li><strong>Gestione:</strong> Monitora in tempo reale carte e attività</li>
+        </ol>
+    </div>
+</div>
+
+<style>
+.create-session-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.create-session-form {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.form-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.help-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #666;
+}        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056b3;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+}
+
+.preview-section {
+    background: #e7f3ff;
+    padding: 25px;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.preview-section h3 {
+    margin-top: 0;
+    color: #0056b3;
+}
+
+.preview-section ol {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.preview-section li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .create-session-container {
+        padding: 10px;
+    }
+    
+    .create-session-form {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+</body>
+</html>

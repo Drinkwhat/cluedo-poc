@@ -1,0 +1,543 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Cluedo Tracker</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cluedo Tracker">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    
+    <style>
+        /* Stili per la homepage */
+        .home-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .home-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .home-header h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .home-header .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin: 0;
+            font-weight: 300;
+        }
+
+        .home-header i {
+            margin-right: 1rem;
+            color: #ffd700;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .home-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .home-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .welcome-section h2 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .welcome-section p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(240, 147, 251, 0.3);
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .actions-section {
+            margin-top: 2rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .action-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .action-card h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .action-card p {
+            color: #7f8c8d;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            margin: 0.5rem;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .quick-join {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .quick-join h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .quick-join-form {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .footer-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #f0f0f0;
+            color: #7f8c8d;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .home-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .home-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-join-form {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .home-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Effetti aggiuntivi */
+        .home-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            animation: slideInDown 0.3s ease-out;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="home-page">
+    <header class="home-header">
+        <h1><i class="fas fa-search"></i> Cluedo Tracker</h1>
+        <p class="subtitle">Gestione Carte in Rete Locale</p>
+    </header>
+
+    <div class="home-container">
+        <div class="home-card">
+            <div id="alertContainer"></div>
+            
+            <!-- Django Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}{{ message.tags }}{% endif %}" style="display: block;">
+                        <i class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="welcome-section">
+                <h2><i class="fas fa-gamepad"></i> Benvenuto al Cluedo Tracker</h2>
+                <p>
+                    Gestisci le tue partite di Cluedo in modo smart! Crea una sessione come host 
+                    o unisciti a una partita esistente per tenere traccia di tutte le carte in tempo reale.
+                </p>
+
+                {% if active_sessions_count %}
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-play-circle"></i>
+                        <div class="number">{{ active_sessions_count }}</div>
+                        <div class="label">Sessioni Attive</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="actions-section">
+                <div class="actions-grid">
+                    <a href="{% url 'host_home' %}" class="action-card">
+                        <i class="fas fa-crown"></i>
+                        <h3>Crea Sessione</h3>
+                        <p>Avvia una nuova partita come host e invita altri giocatori</p>
+                    </a>
+
+                    <a href="{% url 'join_session' %}" class="action-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Unisciti</h3>
+                        <p>Partecipa a una sessione esistente con il codice di invito</p>
+                    </a>
+                </div>
+
+                <div class="quick-join">
+                    <h3><i class="fas fa-bolt"></i> Accesso Rapido</h3>
+                    <form id="quickJoinForm" class="quick-join-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="sessionCode">Codice Sessione:</label>
+                            <input type="text" id="sessionCode" name="sessionCode" 
+                                   placeholder="Inserisci codice" maxlength="6" style="text-transform: uppercase;">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <div class="loading-spinner" id="loadingSpinner"></div>
+                            <i class="fas fa-sign-in-alt" id="joinIcon"></i>
+                            <span id="joinText">Unisciti</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="footer-info">
+                <p><i class="fas fa-wifi"></i> Funziona in rete locale - Nessuna connessione internet richiesta</p>
+                <p><i class="fas fa-mobile-alt"></i> Ottimizzato per dispositivi mobili e desktop</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        window.DJANGO_CONFIG = {
+            csrfToken: '{{ csrf_token }}',
+            apiBaseUrl: '/api/',
+            staticUrl: '{% get_static_prefix %}'
+        };
+
+        // Show alert function
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'check-circle'}"></i>
+                ${message}
+            `;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            alertDiv.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Loading state management
+        function setLoadingState(loading) {
+            const button = document.querySelector('#quickJoinForm button');
+            const spinner = document.getElementById('loadingSpinner');
+            const icon = document.getElementById('joinIcon');
+            const text = document.getElementById('joinText');
+            
+            if (loading) {
+                button.disabled = true;
+                spinner.style.display = 'block';
+                icon.style.display = 'none';
+                text.textContent = 'Verifica...';
+                button.style.opacity = '0.7';
+            } else {
+                button.disabled = false;
+                spinner.style.display = 'none';
+                icon.style.display = 'inline';
+                text.textContent = 'Unisciti';
+                button.style.opacity = '1';
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-uppercase session code input
+            const sessionCodeInput = document.getElementById('sessionCode');
+            sessionCodeInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+
+            // Handle quick join form
+            document.getElementById('quickJoinForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const sessionCode = sessionCodeInput.value.trim();
+                
+                if (!sessionCode) {
+                    showAlert('Per favore inserisci un codice sessione', 'error');
+                    sessionCodeInput.focus();
+                    return;
+                }
+
+                if (sessionCode.length !== 6) {
+                    showAlert('Il codice sessione deve essere di 6 caratteri', 'error');
+                    sessionCodeInput.focus();
+                    return;
+                }
+                
+                setLoadingState(true);
+                
+                // Redirect to join page
+                setTimeout(() => {
+                    window.location.href = `/join/${sessionCode}/`;
+                }, 500);
+            });
+
+            // Add interactive effects
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Focus on session code input
+            setTimeout(() => {
+                sessionCodeInput.focus();
+            }, 300);
+        });
+    </script>
+</body>
+</html>

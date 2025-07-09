@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluedo Tracker - Richieste del Progetto</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .slide {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideIn 0.6s ease-out;
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .slide h2 {
+            color: #34495e;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slide h3 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .slide p {
+            color: #5a6c7d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .slide ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .slide li {
+            color: #34495e;
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            padding-left: 2rem;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .slide li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .slide li.pending::before {
+            content: "⏳";
+            color: #f39c12;
+        }
+
+        .slide li.done::before {
+            content: "✅";
+            color: #27ae60;
+        }
+
+        .slide li.bug::before {
+            content: "🐛";
+            color: #e74c3c;
+        }
+
+        .slide li.feature::before {
+            content: "🚀";
+            color: #3498db;
+        }
+
+        .feature-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-box h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tech-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .tech-item i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #667eea;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #667eea;
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .status-card {
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .status-bug {
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .slide h1 {
+                font-size: 2rem;
+            }
+
+            .slide h2 {
+                font-size: 1.5rem;
+            }
+
+            .tech-stack {
+                grid-template-columns: 1fr;
+            }
+
+            .navigation {
+                bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">1 / 7</div>
+
+    <!-- Slide 1: Titolo -->
+    <div class="slide-container">
+        <div class="slide active">
+            <h1><i class="fas fa-gamepad"></i> Cluedo Tracker</h1>
+            <p class="subtitle">Sistema di gestione carte per partite di Cluedo in rete locale</p>
+            
+            <div class="feature-box">
+                <h4><i class="fas fa-bullseye"></i> Obiettivo del Progetto</h4>
+                <p>Creare un'applicazione web Django per gestire le carte di Cluedo durante le partite, permettendo ai giocatori di tenere traccia delle proprie carte e delle informazioni condivise in tempo reale attraverso la rete locale.</p>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <i class="fab fa-python"></i>
+                    <h4>Django 4.2</h4>
+                    <p>Backend Framework</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-database"></i>
+                    <h4>SQLite</h4>
+                    <p>Database</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-js"></i>
+                    <h4>JavaScript</h4>
+                    <p>Frontend Interattivo</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-wifi"></i>
+                    <h4>WebSockets</h4>
+                    <p>Real-time Updates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Funzionalità Principali -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2><i class="fas fa-star"></i> Funzionalità Principali</h2>
+            
+            <h3><i class="fas fa-users"></i> Gestione Sessioni</h3>
+            <ul>
+                <li class="done">Creazione sessioni con codice univoco</li>
+                <li class="done">Join tramite codice QR o manuale</li>
+                <li class="done">Interfaccia host per gestire la partita</li>
+                <li class="done">Supporto multi-dispositivo sulla rete locale</li>
+            </ul>
+
+            <h3><i class="fas fa-cards-blank"></i> Gestione Carte</h3>
+            <ul>
+                <li class="done">Selezione carte iniziali durante il join</li>
+                <li class="done">Tracking delle carte possedute</li>
+                <li class="pending">Condivisione informazioni tra giocatori</li>
+                <li class="pending">Sistema di deduzioni e note</li>
+            </ul>
+
+            <h3><i class="fas fa-mobile-alt"></i> Esperienza Utente</h3>
+            <ul>
+                <li class="done">Design responsive e moderno</li>
+                <li class="done">Interfaccia intuitiva con glassmorphism</li>
+                <li class="done">Feedback visivo e animazioni</li>
+                <li class="done">Supporto dispositivi mobili</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 3: Architettura Tecnica -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2><i class="fas fa-code"></i> Architettura Tecnica</h2>
+            
+            <h3><i class="fas fa-server"></i> Backend (Django)</h3>
+            <ul>
+                <li class="done">Models: GameSession, Player, Card, PlayerCard</li>
+                <li class="done">Views: Home, Join, Host, Player Session</li>
+                <li class="done">API REST per operazioni AJAX</li>
+                <li class="done">Management commands per inizializzazione</li>
+            </ul>
+
+            <h3><i class="fas fa-desktop"></i> Frontend</h3>
+            <ul>
+                <li class="done">Template HTML con Django Template Language</li>
+                <li class="done">CSS avanzato con gradients e animazioni</li>
+                <li class="done">JavaScript vanilla per interattività</li>
+                <li class="done">Font Awesome per icone</li>
+            </ul>
+
+            <h3><i class="fas fa-network-wired"></i> Networking</h3>
+            <ul>
+                <li class="done">Server accessibile su rete locale (0.0.0.0:8000)</li>
+                <li class="done">Detection automatica IP locale</li>
+                <li class="pending">WebSocket per aggiornamenti real-time</li>
+                <li class="done">QR code per join rapido</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 4: Completato -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2><i class="fas fa-check-circle"></i> Completato</h2>
+            
+            <div class="status-grid">
+                <div class="status-card status-completed">
+                    <h3>✅ UI/UX Design</h3>
+                    <p>Restyling completo di tutti i template con design moderno e responsive</p>
+                </div>
+                <div class="status-card status-completed">
+                    <h3>✅ Backend Logic</h3>
+                    <p>Implementazione completa delle views e models per gestione sessioni</p>
+                </div>
+                <div class="status-card status-completed">
+                    <h3>✅ Card Selection</h3>
+                    <p>Sistema di selezione carte iniziali durante il join</p>
+                </div>
+            </div>
+
+            <h3><i class="fas fa-palette"></i> Restyling Avanzato</h3>
+            <ul>
+                <li class="done">Design glassmorphism con effetti blur</li>
+                <li class="done">Palette colori moderna (viola-blu gradient)</li>
+                <li class="done">Animazioni CSS e transizioni smooth</li>
+                <li class="done">Layout responsive per tutti i dispositivi</li>
+            </ul>
+
+            <h3><i class="fas fa-bug"></i> Bug Fixes</h3>
+            <ul>
+                <li class="done">Risolti errori TemplateSyntaxError</li>
+                <li class="done">Fix NoReverseMatch URL patterns</li>
+                <li class="done">Correzione nomi URL nei template</li>
+                <li class="done">Gestione errori JavaScript</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 5: In Lavorazione -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2><i class="fas fa-cogs"></i> In Lavorazione</h2>
+            
+            <h3><i class="fas fa-cards-blank"></i> Gestione Carte Iniziali</h3>
+            <ul>
+                <li class="done">Frontend: selezione carte con checkbox</li>
+                <li class="done">JavaScript: invio dati al backend</li>
+                <li class="done">Backend: metodo _process_initial_cards</li>
+                <li class="pending">Test end-to-end della funzionalità</li>
+            </ul>
+
+            <h3><i class="fas fa-share-alt"></i> Condivisione Informazioni</h3>
+            <ul>
+                <li class="pending">Sistema di condivisione carte tra giocatori</li>
+                <li class="pending">Interfaccia per mostrare/nascondere informazioni</li>
+                <li class="pending">Log delle azioni per cronologia</li>
+                <li class="pending">Notifiche real-time via WebSocket</li>
+            </ul>
+
+            <h3><i class="fas fa-tools"></i> Debug e Testing</h3>
+            <ul>
+                <li class="done">Django Debug Toolbar installato</li>
+                <li class="pending">Test completi della selezione carte</li>
+                <li class="pending">Validazione integrazione frontend/backend</li>
+                <li class="pending">Performance optimization</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 6: Prossimi Passi -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2><i class="fas fa-road"></i> Prossimi Passi</h2>
+            
+            <h3><i class="fas fa-list-check"></i> Priorità Immediate</h3>
+            <ul>
+                <li class="feature">Completare test selezione carte iniziali</li>
+                <li class="feature">Implementare visualizzazione carte nella sessione</li>
+                <li class="feature">Aggiungere sistema di note personali</li>
+                <li class="feature">Migliorare feedback utente durante join</li>
+            </ul>
+
+            <h3><i class="fas fa-rocket"></i> Funzionalità Avanzate</h3>
+            <ul>
+                <li class="feature">Sistema di deduzioni automatiche</li>
+                <li class="feature">Condivisione strategica delle informazioni</li>
+                <li class="feature">Cronologia delle azioni di gioco</li>
+                <li class="feature">Statistiche di partita</li>
+            </ul>
+
+            <h3><i class="fas fa-shield-alt"></i> Robustezza</h3>
+            <ul>
+                <li class="feature">Gestione disconnessioni</li>
+                <li class="feature">Validazione input più rigorosa</li>
+                <li class="feature">Error handling migliorato</li>
+                <li class="feature">Backup e recovery dati</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Slide 7: Stato Attuale -->
+    <div class="slide-container">
+        <div class="slide">
+            <h2><i class="fas fa-chart-line"></i> Stato Attuale del Progetto</h2>
+            
+            <div class="feature-box">
+                <h4><i class="fas fa-info-circle"></i> Situazione Corrente</h4>
+                <p>Il sistema è <span class="highlight">funzionante</span> con interfaccia completa per host e giocatori. La selezione delle carte iniziali è implementata ma necessita di test completi per verificare il funzionamento end-to-end.</p>
+            </div>
+
+            <h3><i class="fas fa-thermometer-half"></i> Completamento</h3>
+            <ul>
+                <li class="done">Core Functionality: <strong>85%</strong></li>
+                <li class="done">UI/UX Design: <strong>95%</strong></li>
+                <li class="pending">Testing: <strong>60%</strong></li>
+                <li class="pending">Documentation: <strong>40%</strong></li>
+            </ul>
+
+            <h3><i class="fas fa-exclamation-triangle"></i> Problemi Noti</h3>
+            <ul>
+                <li class="bug">Selezione carte non sempre visibile</li>
+                <li class="bug">Necessaria verifica salvataggio PlayerCard</li>
+                <li class="bug">WebSocket non ancora implementato</li>
+            </ul>
+
+            <div class="feature-box">
+                <h4><i class="fas fa-flag-checkered"></i> Prossimo Milestone</h4>
+                <p>Completare e testare la funzionalità di selezione carte iniziali, assicurandosi che le carte selezionate vengano correttamente salvate e visualizzate nella sessione di gioco.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">
+            <i class="fas fa-chevron-left"></i> Precedente
+        </button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">
+            Successivo <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            // Update counter
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(n) {
+            showSlide(currentSlide + n);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Initialize
+        showSlide(0);
+
+        // Auto-hide navigation on mobile
+        let hideTimeout;
+        function showNavigation() {
+            document.querySelector('.navigation').style.opacity = '1';
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => {
+                document.querySelector('.navigation').style.opacity = '0.7';
+            }, 3000);
+        }
+
+        document.addEventListener('mousemove', showNavigation);
+        document.addEventListener('touchstart', showNavigation);
+
+        // Add some interactive effects
+        document.querySelectorAll('.tech-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.05)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Slide transition effects
+        function addSlideTransition() {
+            slides.forEach((slide, index) => {
+                slide.style.transition = 'all 0.5s ease-in-out';
+                if (index !== currentSlide) {
+                    slide.style.transform = 'translateX(100%)';
+                } else {
+                    slide.style.transform = 'translateX(0)';
+                }
+            });
+        }
+
+        // Initialize slide positions
+        showSlide(0);
+    </script>
+</body>
+</html>

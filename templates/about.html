@@ -1,0 +1,785 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informazioni - Cluedo Tracker</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cluedo Tracker">
+    
+    <style>
+        .about-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-header .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin: 0;
+        }
+
+        /* App Info Card */
+        .app-info-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem auto;
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .app-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        .app-info-card h2 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-weight: 600;
+            margin: 0 0 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .app-description {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Features Section */
+        .features-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0 0 2rem 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-card h3 {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+        }
+
+        .feature-card p {
+            color: #7f8c8d;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Tech Stack Section */
+        .tech-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .tech-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .tech-item i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #667eea;
+        }
+
+        .tech-item:hover i {
+            color: white;
+        }
+
+        .tech-item h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Developer Info */
+        .developer-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .developer-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .developer-avatar i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .developer-section h3 {
+            color: #2c3e50;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .developer-section p {
+            color: #7f8c8d;
+            margin: 0 0 1rem 0;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .about-page {
+                padding: 1rem 0;
+            }
+
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .app-info-card {
+                padding: 2rem;
+            }
+
+            .app-info-card h2 {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="about-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-search" style="color: #ffd700;"></i> Cluedo Tracker</h1>
+            <p class="subtitle">Il tuo assistente digitale per Cluedo</p>
+        </div>
+
+        <!-- App Info -->
+        <div class="app-info-card">
+            <div class="app-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h2>Cluedo Mobile Tracker</h2>
+            <div class="version-badge">
+                <i class="fas fa-tag"></i> Versione 2.0
+            </div>
+            <p class="app-description">
+                Un'applicazione web moderna e intuitiva per tenere traccia delle carte e delle deduzioni 
+                durante le partite a Cluedo. Ottimizzata per dispositivi mobili con supporto real-time 
+                per sessioni multiplayer in rete locale.
+            </p>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features-section">
+            <h2 class="section-title">
+                <i class="fas fa-star" style="color: #ffd700;"></i> Caratteristiche
+            </h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile-First</h3>
+                    <p>Interfaccia ottimizzata per dispositivi mobili con controlli touch-friendly e design responsive</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Multiplayer</h3>
+                    <p>Condividi informazioni in tempo reale con altri giocatori nella stessa sessione di gioco</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3>QR Code</h3>
+                    <p>Accesso rapido alle sessioni tramite scansione QR code, perfetto per il gioco da tavolo</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h3>Real-time</h3>
+                    <p>Aggiornamenti live tramite WebSocket per un'esperienza di gioco fluida e sincronizzata</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <h3>Note Personali</h3>
+                    <p>Tieni traccia delle tue deduzioni con un sistema di note personali salvate automaticamente</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>Rete Locale</h3>
+                    <p>Funziona completamente in rete locale senza necessità di connessione internet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="tech-section">
+            <h3 class="section-title" style="color: #2c3e50; margin-bottom: 1rem;">
+                <i class="fas fa-code"></i> Tecnologie Utilizzate
+            </h3>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <i class="fab fa-python"></i>
+                    <h4>Python/Django</h4>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-js-square"></i>
+                    <h4>JavaScript</h4>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-html5"></i>
+                    <h4>HTML5</h4>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-css3-alt"></i>
+                    <h4>CSS3</h4>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-database"></i>
+                    <h4>SQLite</h4>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-plug"></i>
+                    <h4>WebSocket</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Developer Info -->
+        <div class="developer-section">
+            <div class="developer-avatar">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h3>Sviluppato con ❤️</h3>
+            <p>Un progetto open-source per migliorare l'esperienza di gioco del Cluedo</p>
+            <p style="font-size: 0.9rem; color: #95a5a6;">
+                © 2025 Cluedo Tracker - Realizzato per appassionati di giochi da tavolo
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="{% url 'home' %}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Torna alla Home
+            </a>
+            <a href="{% url 'join_session' %}" class="btn btn-outline">
+                <i class="fas fa-play"></i> Inizia a Giocare
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+                    <div class="feature-item">
+                        <i class="fas fa-save"></i>
+                        <h4>Auto-Save</h4>
+                        <p>Your notes and card states are automatically saved</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Secure</h4>
+                        <p>Session-based security with unique device identification</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tech-section">
+                <h3><i class="fas fa-cogs"></i> Technology</h3>
+                <div class="tech-stack">
+                    <div class="tech-item">
+                        <i class="fab fa-python"></i>
+                        <span>Django</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-bolt"></i>
+                        <span>WebSockets</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-js"></i>
+                        <span>JavaScript</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-html5"></i>
+                        <span>HTML5</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fab fa-css3-alt"></i>
+                        <span>CSS3</span>
+                    </div>
+                    <div class="tech-item">
+                        <i class="fas fa-database"></i>
+                        <span>SQLite</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="usage-section">
+                <h3><i class="fas fa-play"></i> How to Use</h3>
+                <ol class="usage-steps">
+                    <li>
+                        <i class="fas fa-plus"></i>
+                        <strong>Create Session:</strong> Start a new Cluedo tracking session
+                    </li>
+                    <li>
+                        <i class="fas fa-qrcode"></i>
+                        <strong>Share QR Code:</strong> Let other players scan to join
+                    </li>
+                    <li>
+                        <i class="fas fa-gamepad"></i>
+                        <strong>Play & Track:</strong> Mark your cards as you play
+                    </li>
+                    <li>
+                        <i class="fas fa-share"></i>
+                        <strong>Share Info:</strong> Exchange card information with players
+                    </li>
+                    <li>
+                        <i class="fas fa-trophy"></i>
+                        <strong>Solve Case:</strong> Use shared knowledge to win!
+                    </li>
+                </ol>
+            </div>
+
+            <div class="about-actions">
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Go Home
+                </a>
+                <button onclick="showDebugInfo()" class="btn btn-secondary">
+                    <i class="fas fa-bug"></i> Debug Info
+                </button>
+            </div>
+
+            <!-- Debug Info Modal -->
+            <div id="debugModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close" onclick="hideDebugInfo()">&times;</span>
+                    <h3>Debug Information</h3>
+                    <div id="debugInfo">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDebugInfo() {
+            const debugInfo = {
+                userAgent: navigator.userAgent,
+                screenSize: `${screen.width}x${screen.height}`,
+                windowSize: `${window.innerWidth}x${window.innerHeight}`,
+                language: navigator.language,
+                cookiesEnabled: navigator.cookieEnabled,
+                onLine: navigator.onLine,
+                localStorage: !!window.localStorage,
+                sessionStorage: !!window.sessionStorage,
+                webSocket: !!window.WebSocket,
+                geolocation: !!navigator.geolocation,
+                timestamp: new Date().toISOString()
+            };
+            
+            const debugHtml = Object.entries(debugInfo)
+                .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`)
+                .join('');
+            
+            document.getElementById('debugInfo').innerHTML = debugHtml;
+            document.getElementById('debugModal').style.display = 'block';
+        }
+        
+        function hideDebugInfo() {
+            document.getElementById('debugModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('debugModal');
+            if (event.target === modal) {
+                hideDebugInfo();
+            }
+        }
+    </script>
+
+    <style>
+        .about-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .app-info {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .app-icon {
+            font-size: 4rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+        
+        .version {
+            color: #7f8c8d;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .feature-item i {
+            font-size: 2rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-item h4 {
+            margin: 0.5rem 0;
+            color: #333;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #e8f4f8;
+            border-radius: 20px;
+            color: #2c3e50;
+        }
+        
+        .tech-item i {
+            font-size: 1.2rem;
+        }
+        
+        .usage-steps {
+            margin-top: 1rem;
+        }
+        
+        .usage-steps li {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .usage-steps i {
+            color: #27ae60;
+            margin-right: 0.5rem;
+        }
+        
+        .about-actions {
+            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        #debugInfo p {
+            margin: 0.5rem 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tech-stack {
+                justify-content: center;
+            }
+        }
+    </style>
+</body>
+</html>

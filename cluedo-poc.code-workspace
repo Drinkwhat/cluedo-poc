@@ -1,0 +1,264 @@
+{
+	"folders": [
+		{
+			"name": "Cluedo POC",
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.defaultInterpreterPath": "./venv/bin/python",
+		"python.terminal.activateEnvironment": true,
+		"python.linting.enabled": true,
+		"python.linting.pylintEnabled": true,
+		"python.formatting.provider": "black",
+		"python.linting.flake8Enabled": true,
+		"files.associations": {
+			"*.html": "html",
+			"*.css": "css",
+			"*.js": "javascript"
+		},
+		"emmet.includeLanguages": {
+			"django-html": "html"
+		},
+		"files.exclude": {
+			"**/__pycache__": true,
+			"**/*.pyc": true,
+			"**/node_modules": true,
+			"**/.git": true,
+			"**/.DS_Store": true,
+			"**/venv": false,
+			"**/env": false
+		},
+		"search.exclude": {
+			"**/__pycache__": true,
+			"**/*.pyc": true,
+			"**/node_modules": true,
+			"**/venv": true,
+			"**/env": true
+		},
+		"django.snippets.enabled": true,
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-python.python",
+			"ms-python.flake8",
+			"ms-python.black-formatter",
+			"batisteo.vscode-django",
+			"bradlc.vscode-tailwindcss",
+			"formulahendry.auto-rename-tag",
+			"ms-vscode.vscode-json",
+			"ms-python.pylint",
+			"ms-toolsai.jupyter",
+			"ms-vscode.sublime-keybindings",
+			"ms-vscode-remote.remote-containers"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Django: Run Server",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "runserver"],
+				"group": {
+					"kind": "build",
+					"isDefault": true
+				},
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": [],
+				"isBackground": true
+			},
+			{
+				"label": "Django: Run Server (Custom Port)",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "runserver", "0.0.0.0:8000"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": [],
+				"isBackground": true
+			},
+			{
+				"label": "Django: Make Migrations",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "makemigrations"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Django: Migrate",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "migrate"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Django: Create Superuser",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "createsuperuser"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": true,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Django: Collect Static",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "collectstatic", "--noinput"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Cluedo: Setup Game",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "setup_cluedo"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Cluedo: Initialize Cards",
+				"type": "shell",
+				"command": "python",
+				"args": ["manage.py", "init_cluedo_cards"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Docker: Build",
+				"type": "shell",
+				"command": "docker-compose",
+				"args": ["build"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Docker: Up",
+				"type": "shell",
+				"command": "docker-compose",
+				"args": ["up", "-d"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": [],
+				"isBackground": true
+			},
+			{
+				"label": "Docker: Down",
+				"type": "shell",
+				"command": "docker-compose",
+				"args": ["down"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			},
+			{
+				"label": "Install Requirements",
+				"type": "shell",
+				"command": "pip",
+				"args": ["install", "-r", "requirements.txt"],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "new"
+				},
+				"problemMatcher": []
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Django: Debug Server",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/manage.py",
+				"args": ["runserver", "--noreload"],
+				"django": true,
+				"justMyCode": false,
+				"console": "integratedTerminal"
+			},
+			{
+				"name": "Django: Debug Server (Custom Port)",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${workspaceFolder}/manage.py",
+				"args": ["runserver", "0.0.0.0:8000", "--noreload"],
+				"django": true,
+				"justMyCode": false,
+				"console": "integratedTerminal"
+			}
+		]
+	}
+}

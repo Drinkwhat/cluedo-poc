@@ -1,0 +1,14 @@
+# Ignora il database SQLite
+*.sqlite3
+
+db.sqlite3
+# Altri file comuni da ignorare
+__pycache__/
+*.pyc
+.env
+.env.*
+*.log
+*.pot
+*.py[cod]
+# VSCode
+.vscode/
